@@ -158,7 +158,7 @@ const RECIPES = [
    {t:"Add the garlic. Stir for 1 minute.", timer:{min:1, label:"Garlic"}},
    {t:"Add {2 tbsp} soy sauce, {2 tbsp} water, lots of black pepper and a few shakes of hot sauce. Let it bubble for 2 minutes.", timer:{min:2, label:"Sauce"}},
    {t:"Fry 1 or 2 eggs in a little butter on medium heat until the white is set."},
-   {t:"Split the beef and rice into {P} equal portions. Eat one now. Pack the rest ({R} more) in containers and get them in the fridge within an hour."},
+   {t:"Split the beef and rice into {P} equal portions. Eat one now. Pack the rest ({R} more) in containers and get them in the fridge within an hour. Eggs don't pack well: fry a fresh one when you eat a leftover bowl."},
    {t:"Your bowl: rice, then beef, then the egg on top. Add salsa or cheese. Eat."}
   ],
   skill:"Browning meat: a hot pan, then leave it alone."},
@@ -187,9 +187,9 @@ const RECIPES = [
    {t:"Drain the black beans in the sieve and rinse them. Warm them in a small pot on medium-low with a pinch of salt.", timer:{min:5, label:"Beans"}},
    {t:"Wipe out the pan. Add ½ tbsp oil and {2 cups} frozen corn on medium-high. Cook until some kernels go golden.", timer:{min:5, label:"Corn"}},
    {t:"Chop the chicken into bite-size pieces."},
-   {t:"Chop a handful of cilantro. Fluff the rice with a fork, then stir in the cilantro and the juice of {0.5 limes}."},
-   {t:"Line up {P} containers. Split the rice, chicken, beans and corn evenly between them."},
-   {t:"Eat one now with cheese, sour cream, avocado and salsa. The rest ({R} more) go in the fridge within an hour.", tip:"Cut the avocado fresh each day. Cut around the pit, twist, and scoop the pit out with a spoon. Never stab it while holding it in your hand."}
+   {t:"Fluff the rice with a fork, then stir in the juice of {0.5 limes}. Chop a handful of cilantro and put it in a small container. It's a topping: it goes on after reheating, never in the microwave."},
+   {t:"Line up {P} containers. Split the rice, chicken, beans and corn evenly between them. Keep every topping out of the containers: cilantro, cheese, sour cream, avocado and salsa."},
+   {t:"Eat one now, topped with cilantro, cheese, sour cream, avocado and salsa. The rest ({R} more) go in the fridge within an hour. For those: microwave the bowl first, then add the toppings.", tip:"Half an avocado per bowl, cut fresh each day. Cut around the pit and twist. Eat the half without the pit; wrap the half with the pit tight and put it in the fridge for tomorrow. Scoop a pit out with a spoon. Never stab it while holding it in your hand."}
   ],
   skill:"Searing: a hot pan, space between pieces, no poking."},
  {id:"salsa", day:"Thu", name:"Fresh salsa (knife practice)", short:"Fresh salsa", sub:"10 min · goes on the bowls and the chili",
@@ -211,7 +211,7 @@ const RECIPES = [
    {t:"Dice {1 onions}.", tip:"Halve it, cut lines toward the root without cutting through it, then slice across."},
    {t:"Dice {1 peppers}: cut off the top, pull out the seeds, slice it into strips, then cut across."},
    {t:"Chop {3 garlic cloves}."},
-   {t:"Measure ALL the spices into one small bowl. Open the tomatoes. Drain and rinse the beans. Get everything ready now, because the next steps go fast."},
+   {t:"Measure ALL the spices into one small bowl: {1 tsp} cayenne, {4 tsp} paprika, {5 tsp} cumin, {2 tsp} garlic powder, {2 tsp} onion powder and {2 tsp} oregano. Open the tomatoes. Drain and rinse the beans. Get everything ready now, because the next steps go fast."},
    {t:"Big pot on medium-high with 1 tbsp oil. Add the garlic and onion and stir for 1 minute.", timer:{min:1, label:"Onion + garlic"}},
    {t:"Add the pepper. Cook 2 minutes, until the onion looks see-through.", timer:{min:2, label:"Pepper"}},
    {t:"Add the beef and break it up. Cook until it's mostly brown.", timer:{min:5, label:"Beef"}},
@@ -220,7 +220,7 @@ const RECIPES = [
    {t:"Turn it down to medium-low. Leave the lid off. Simmer, stirring every 5 minutes or so, until it's thick.", timer:{min:25, label:"Chili simmering"}, tip:"Bigger batch? Give it 5–10 more minutes to thicken."},
    {t:"Taste it. Add salt a pinch at a time until it tastes right. Start with {0.5 tsp}."},
    {t:"Check the potatoes: a knife should slide in with no push. Split one open and squash the inside with a fork."},
-   {t:"Pile on chili, cheese, sour cream and cilantro. Pack the rest ({R} more), with a potato each, into the fridge within an hour."}
+   {t:"Pile on chili, cheese, sour cream and cilantro. Pack the rest ({R} more), with a potato each, into the fridge within an hour. Keep the toppings out: microwave first, then add cheese, sour cream and cilantro."}
   ],
   skill:"Building a sauce: spices into hot fat for 1 minute, then the tomatoes."},
  {id:"salmon", day:"Sun", name:"Garlic butter salmon + crispy potatoes", short:"Salmon + potatoes", sub:"40 min · makes {P} plates",
@@ -240,7 +240,7 @@ const RECIPES = [
    {t:"Turn the heat down to medium. Add {3 tbsp} butter.", tip:"Butter burns at high heat. That's why it goes in now, with the heat lower."},
    {t:"When the butter foams, add the garlic. Tilt the pan and spoon the butter over the salmon again and again.", timer:{min:1.5, label:"Basting"}},
    {t:"Push a fork into the thickest part. If it flakes easily, it's done. Move it to a plate to rest for 3 minutes. Squeeze a little lemon into the pan butter."},
-   {t:"Plate one fillet with your share of the potatoes and beans, and pour the pan butter over. Pack the rest ({R} more) for lunch."}
+   {t:"Plate one fillet with your share of the potatoes and beans. Pour your share of the pan butter over and squeeze a lemon wedge on top. Pack the rest ({R} more) for lunch, with the rest of the butter and a lemon wedge."}
   ],
   skill:"Perfect potatoes, and basting with butter."},
  {id:"picadillo", day:"Mon", name:"Mexican picadillo over rice", short:"Picadillo + rice", sub:"50 min · makes {P} portions",
@@ -253,7 +253,7 @@ const RECIPES = [
    {t:"When it boils, put the lid on and turn it down to low.", timer:{min:15, label:"Rice", then:"Tilt the pot. Water still in the bottom? Lid back on for 3 more minutes, then check again. No water left? Take it off the burner, keep the lid on, and start the rest timer.", next:{min:10, label:"Rice resting"}}},
    {t:"High-sided pan on medium with a little oil. Add the beef and break it up. Cook until it's mostly brown.", timer:{min:6, label:"Beef"}},
    {t:"Add the onion, pepper and garlic with a pinch of salt.", timer:{min:5, label:"Veggies"}},
-   {t:"Add the spices. Stir for 1 minute.", timer:{min:1, label:"Spices"}},
+   {t:"Add {2 tsp} chili powder, {1 tsp} cumin, {1 tsp} oregano and {1 tsp} garlic powder. Stir for 1 minute.", timer:{min:1, label:"Spices"}},
    {t:"Add the tomato sauce, broth, potatoes and the jalapeño pieces. Bring it to a boil."},
    {t:"Turn it down to medium-low. Put the lid on, leaving a small gap. Simmer until most of the liquid has soaked up and a potato cube squashes easily.", timer:{min:25, label:"Picadillo simmering"}},
    {t:"Fish out the jalapeño pieces. Squeeze in {0.5 limes}. Taste, and add salt if it needs it."},
@@ -262,7 +262,7 @@ const RECIPES = [
   skill:"Even dicing."},
  {id:"fried", day:"Any", name:"Leftover fried rice", short:"Fried rice", sub:"15 min · turns leftover meat into a new meal",
   main:{label:"leftover meat", base:1, unit:"portions"}, portions:1, keep:4, noFreeze:true, noFridge:true,
-  need:["{1 portions} of leftover cooked meat (beef, chicken, chili meat, whatever's in the fridge)","{1.5 cups} cooked rice (cold day-old rice is best)","{1 eggs}","{0.25 onions}","{1 garlic cloves}","A handful of frozen corn (optional)","{1 tbsp} soy sauce, black pepper, hot sauce"],
+  need:["{1 portions} of leftover cooked meat (beef, chicken, chili meat, whatever's in the fridge)","{1.5 cups} cooked rice (cold day-old rice is best)","{1 eggs}","{0.25 onions}","{1 garlic cloves}","A handful of frozen corn (optional)","{1 tbsp} soy sauce, black pepper, hot sauce","1 tbsp oil"],
   steps:[
    {t:"Fan on high. Turn the leftover meat out onto the board and chop up any big chunks."},
    {t:"No cooked rice? Make some now: rinse {0.5 cups} rice, put it in a pot with {0.75 cups} water and a pinch of salt. When it boils, put the lid on and turn it down to low.", timer:{min:15, label:"Rice", then:"Tilt the pot. Water left? Lid back on for 3 more minutes. No water? Spread the rice on a plate so it dries out a little while you prep."}, tip:"Already have cooked rice? Skip this step."},
