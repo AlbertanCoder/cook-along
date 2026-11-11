@@ -127,6 +127,17 @@ h3{font-size:19px;font-weight:700}
 .next-up{margin:18px 0 0;padding-top:12px;border-top:1px dashed var(--line)}
 .swipe-hint{text-align:center;font-size:13px;color:var(--muted);margin:6px 0 0}
 .done-mark{font-size:44px;line-height:1}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+.seg.three button{text-align:center;padding:10px 6px}
+.notes-ta{width:100%;min-height:96px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;color:inherit;resize:vertical}
+.notes-ta:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.days{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.dayb{background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;text-align:left;line-height:1.25;min-width:0}
+.dayb b{display:block;font-family:var(--display);font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
+.dayb span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;color:var(--muted)}
+.dayb.on{border-color:var(--accent);background:var(--skill)}
+.dayb.now b::after{content:" ●";font-size:10px;vertical-align:2px;color:var(--heat)}
+.daysel{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:12px}
 @media (max-width:420px){ .step-text{font-size:21px} .pick .day{width:48px} }
 @media (prefers-reduced-motion: reduce){ .bar i{transition:none} }
 </style>
@@ -140,8 +151,9 @@ h3{font-size:19px;font-weight:700}
   {450 g}  {1.5 cups}  {3 garlic cloves}  {0.5 limes}
   {P} = portions this batch makes, {R} = portions left after the one you eat now.
 */
+const RICE = {min:15, label:"Rice", then:"Tilt the pot. Water still in the bottom? Lid back on for 3 more minutes, then check again. No water left? Take it off the burner, keep the lid on, and start the rest timer.", next:{min:10, label:"Rice resting"}};
 const RECIPES = [
- {id:"tonight", day:"Tue", name:"Garlic-soy beef rice bowl", short:"Garlic-soy beef bowl", sub:"30 min · makes {P} bowls",
+ {id:"tonight", name:"Garlic-soy beef rice bowl", short:"Garlic-soy beef bowl", sub:"30 min · makes {P} bowls",
   main:{label:"ground beef", base:450, unit:"g", hint:"No scale? Go by the pack label. Half of a 900 g pack is about 450 g."}, portions:2, keep:4,
   need:["{1 cups} rice","{450 g} ground beef","{0.5 yellow onions} (white or red work too)","{3 garlic cloves} (or {1 tsp} garlic powder)","{2 tbsp} soy sauce (low-sodium if you have it)","Hot sauce, black pepper","1–2 eggs per bowl, a little butter","Salsa or cheese for the top"],
   steps:[
@@ -162,7 +174,7 @@ const RECIPES = [
    {t:"Your bowl: rice, then beef, then the egg on top. Add salsa or cheese. Eat."}
   ],
   skill:"Browning meat: a hot pan, then leave it alone."},
- {id:"bowls", day:"Wed", name:"Chicken burrito bowls", short:"Chicken burrito bowl", sub:"45 min + 30 min marinating · makes {P} bowls",
+ {id:"bowls", name:"Chicken burrito bowls", short:"Chicken burrito bowl", sub:"45 min + 30 min marinating · makes {P} bowls",
   main:{label:"chicken", base:800, unit:"g", hint:"No scale? One chicken breast is roughly 250–300 g. Count them and multiply. Close enough is fine."}, portions:4, keep:4,
   option:{key:"breast", label:"I have chicken breasts, not thighs", dflt:true,
     need:{0:"{800 g} boneless skinless chicken breasts"},
@@ -192,7 +204,7 @@ const RECIPES = [
    {t:"Eat one now, topped with cilantro, cheese, sour cream, avocado and salsa. The rest ({R} more) go in the fridge within an hour. For those: microwave the bowl first, then add the toppings.", tip:"Half an avocado per bowl, cut fresh each day. Cut around the pit and twist. Eat the half without the pit; wrap the half with the pit tight and put it in the fridge for tomorrow. Scoop a pit out with a spoon. Never stab it while holding it in your hand."}
   ],
   skill:"Searing: a hot pan, space between pieces, no poking."},
- {id:"salsa", day:"Thu", name:"Fresh salsa (knife practice)", short:"Fresh salsa", sub:"10 min · goes on the bowls and the chili",
+ {id:"salsa", name:"Fresh salsa (knife practice)", short:"Fresh salsa", sub:"10 min · goes on the bowls and the chili",
   main:{label:"Roma tomatoes", base:3, unit:"tomatoes"}, portions:null, keep:3, noFreeze:true,
   need:["{3 Roma tomatoes}","{0.25 onions} (white, red or yellow)","{0.5 jalapeños}","A handful of cilantro","{0.5 limes}, pinch of salt"],
   steps:[
@@ -202,7 +214,7 @@ const RECIPES = [
    {t:"Chop the cilantro. Mix everything in a bowl with the juice of {0.5 limes} and a pinch of salt. Done. It keeps in the fridge for 2–3 days."}
   ],
   skill:"Knife grip and dicing."},
- {id:"chili", day:"Fri", name:"Beef & bean chili on a baked potato", short:"Chili + baked potato", sub:"50 min · makes {P} big portions",
+ {id:"chili", name:"Beef & bean chili on a baked potato", short:"Chili + baked potato", sub:"50 min · makes {P} big portions",
   main:{label:"ground beef", base:700, unit:"g", hint:"No scale? Go by the pack label. Close enough is fine."}, portions:4, keep:4,
   need:["{4 russet potatoes} (medium)","{700 g} lean ground beef","{1 yellow onions}, {1 bell peppers}, {3 garlic cloves}","Spices: {1 tsp} cayenne, {4 tsp} paprika, {5 tsp} cumin, {2 tsp} garlic powder, {2 tsp} onion powder, {2 tsp} oregano","{3 tbsp} tomato paste","Crushed or diced tomatoes: {1 big cans} (796 mL)","Red kidney beans: {1 cans}","{1 cups} low-sodium beef broth","Avocado oil, salt","Cheese, sour cream, cilantro"],
   steps:[
@@ -223,7 +235,7 @@ const RECIPES = [
    {t:"Pile on chili, cheese, sour cream and cilantro. Pack the rest ({R} more), with a potato each, into the fridge within an hour. Keep the toppings out: microwave first, then add cheese, sour cream and cilantro."}
   ],
   skill:"Building a sauce: spices into hot fat for 1 minute, then the tomatoes."},
- {id:"salmon", day:"Sun", name:"Garlic butter salmon + crispy potatoes", short:"Salmon + potatoes", sub:"40 min · makes {P} plates",
+ {id:"salmon", name:"Garlic butter salmon + crispy potatoes", short:"Salmon + potatoes", sub:"40 min · makes {P} plates",
   main:{label:"salmon", base:2, unit:"fillets"}, portions:2, keep:3,
   need:["{2 salmon fillets} (about 180 g each)","{3 potatoes} (medium, about {500 g})","{2 cups} frozen green beans","{3 tbsp} butter","{2 garlic cloves}","{1 lemons}","Avocado oil","Salt, pepper, garlic powder, smoked paprika"],
   steps:[
@@ -243,7 +255,7 @@ const RECIPES = [
    {t:"Plate one fillet with your share of the potatoes and beans. Pour your share of the pan butter over and squeeze a lemon wedge on top. Pack the rest ({R} more) for lunch, with the rest of the butter and a lemon wedge."}
   ],
   skill:"Perfect potatoes, and basting with butter."},
- {id:"picadillo", day:"Mon", name:"Mexican picadillo over rice", short:"Picadillo + rice", sub:"50 min · makes {P} portions",
+ {id:"picadillo", name:"Mexican picadillo over rice", short:"Picadillo + rice", sub:"50 min · makes {P} portions",
   main:{label:"ground beef", base:650, unit:"g", hint:"No scale? Go by the pack label. Close enough is fine."}, portions:4, keep:4,
   need:["{650 g} lean ground beef","{2 russet potatoes}","{1 yellow onions}, {0.5 bell peppers}, {3 garlic cloves}, {0.5 jalapeños}","{2 tsp} chili powder, {1 tsp} cumin, {1 tsp} oregano, {1 tsp} garlic powder","{1 cups} tomato sauce","{2 cups} low-sodium beef broth","{0.5 limes}, salt, a little oil","{1.5 cups} rice"],
   steps:[
@@ -260,7 +272,89 @@ const RECIPES = [
    {t:"Serve over rice. Pack the rest ({R} more) and get them in the fridge within an hour."}
   ],
   skill:"Even dicing."},
- {id:"fried", day:"Any", name:"Leftover fried rice", short:"Fried rice", sub:"15 min · turns leftover meat into a new meal",
+ {id:"beeftaco", name:"Beef & black bean taco bowls", short:"Beef taco bowl", sub:"35 min · makes {P} bowls",
+  main:{label:"ground beef", base:450, unit:"g", hint:"No scale? Go by the pack label. Close enough is fine."}, portions:4, keep:4,
+  need:["{450 g} lean ground beef","{1 cans} black beans","{1.5 cups} rice","{2 cups} frozen corn","{0.5 yellow onions}, {3 garlic cloves}","Taco spices: {2 tsp} chili powder, {1.5 tsp} cumin, {1 tsp} smoked paprika, {1 tsp} garlic powder, {0.5 tsp} oregano, {0.5 tsp} salt, black pepper","{2 tbsp} tomato paste","{0.5 limes}","Avocado oil","Romaine, avocado, salsa, cheese, Greek yogurt or sour cream for the top"],
+  steps:[
+   {t:"Fan on high."},
+   {t:"Rinse {1.5 cups} of rice in a sieve. Put it in a pot with {2.25 cups} water and a pinch of salt. Burner on high."},
+   {t:"When it boils, put the lid on and turn it down to low.", timer:RICE},
+   {t:"Dice {0.5 yellow onions}. Chop {3 garlic cloves}."},
+   {t:"Measure the taco spices into one small bowl: {2 tsp} chili powder, {1.5 tsp} cumin, {1 tsp} smoked paprika, {1 tsp} garlic powder, {0.5 tsp} oregano, {0.5 tsp} salt and lots of black pepper. Drain the black beans in the sieve and rinse them.", tip:"That's your own taco seasoning. The packets are mostly salt, starch and sugar."},
+   {t:"Put the cast iron pan on medium-high with ½ tbsp oil. Let it heat for 3–4 minutes.", timer:{min:4, label:"Pan heating"}},
+   {t:"Tip in {2 cups} frozen corn and spread it flat. Leave it alone for 3 minutes, stir once, then leave it 2 more, until lots of kernels have golden-brown spots. Move it to a bowl.", timer:{min:5, label:"Corn"}, tip:"Straight from the freezer is fine. Not stirring is how it gets those toasty bits."},
+   {t:"Same pan, still on medium-high. Add the beef and break it into chunks with the spatula. Leave it alone for 3 minutes so it goes brown, then stir and break it up until there's no pink left.", timer:{min:3, label:"Brown the beef"}, tip:"Lean beef doesn't need draining. If there's a big puddle of fat, spoon most of it out."},
+   {t:"Add the onion and cook for 3 minutes, stirring now and then.", timer:{min:3, label:"Onion"}},
+   {t:"Turn the heat down to medium. Add the garlic and the spice bowl and stir for 1 minute.", timer:{min:1, label:"Spices"}, tip:"Spices burn fast, so the liquid goes in right after."},
+   {t:"Add {2 tbsp} tomato paste, the black beans and {0.5 cups} water. Stir and let it bubble until it's thick and saucy, not watery.", timer:{min:3, label:"Taco beef"}},
+   {t:"Squeeze in {0.5 limes}. Taste it, and add salt a pinch at a time if it needs it."},
+   {t:"Fluff the rice with a fork. Line up {P} containers and split the rice, taco beef and corn between them. Keep the toppings out: lettuce, avocado, salsa, cheese, yogurt."},
+   {t:"Your bowl: shred some romaine on top, then avocado, salsa, a little cheese and a spoon of Greek yogurt. The rest ({R} more) go in the fridge within an hour. Microwave first, then add the toppings.", tip:"Lighter bowl: half rice, half shredded lettuce. Greek yogurt tastes a lot like sour cream and has way more protein."}
+  ],
+  skill:"Making your own taco seasoning, and toasting corn."},
+ {id:"fajita", name:"Chicken fajita bowls", short:"Fajita bowl", sub:"45 min + 30 min marinating · makes {P} bowls",
+  main:{label:"chicken", base:700, unit:"g", hint:"No scale? One chicken breast is roughly 250–300 g. Count them and multiply."}, portions:4, keep:4,
+  need:["{700 g} boneless skinless chicken breasts (thighs work too)","{3 bell peppers} (mixed colours look great)","{1 yellow onions}","{1.5 limes}","Avocado oil (about {3 tbsp} total)","Fajita spices: {2 tsp} chili powder, {1 tsp} cumin, {1 tsp} smoked paprika, {1 tsp} garlic powder, {0.5 tsp} oregano, {1 tsp} salt, {0.5 tsp} pepper","{1.5 cups} rice","{1 cans} black beans","Avocado, salsa, Greek yogurt, cilantro for the top"],
+  steps:[
+   {t:"Do this at least 30 minutes before you cook. In a big bowl, mix {2 tbsp} avocado oil, the juice of {1 limes}, {2 tsp} chili powder, {1 tsp} cumin, {1 tsp} smoked paprika, {1 tsp} garlic powder, {0.5 tsp} oregano, {1 tsp} salt and {0.5 tsp} pepper."},
+   {t:"Cut the chicken into strips about as thick as your finger. Add them to the marinade and toss with your hands until coated. Cover the bowl, put it in the fridge, and wash your hands.", timer:{min:30, label:"Chicken marinating", then:"The chicken can cook now, or wait in the fridge up to 8 hours."}, tip:"Strips the same thickness cook at the same speed."},
+   {t:"Time to cook. Fan on high."},
+   {t:"Rinse {1.5 cups} of rice in a sieve. Put it in a pot with {2.25 cups} water and a pinch of salt. Burner on high."},
+   {t:"When it boils, put the lid on and turn it down to low.", timer:RICE},
+   {t:"Slice {3 bell peppers} into strips: cut off the top, pull out the seeds, then slice. Cut {1 yellow onions} in half from top to root, peel it, and slice it into thin half-moons."},
+   {t:"Drain the black beans in the sieve and rinse them. Warm them in a small pot on medium-low with a pinch of salt.", timer:{min:5, label:"Beans"}},
+   {t:"Put the cast iron pan on medium-high with ½ tbsp oil. Let it heat for 3–4 minutes.", timer:{min:4, label:"Pan heating"}},
+   {t:"Add the peppers and onion with a pinch of salt. Leave them alone for 3 minutes, stir, then leave them 3 more, until they're soft with some black edges. Move them to a bowl.", timer:{min:6, label:"Peppers + onion"}, tip:"Those dark edges are called char. That's the fajita flavour, not burnt."},
+   {t:"Add ½ tbsp oil. Lift the chicken strips out of the marinade and lay them in the pan with a gap between each. If they don't all fit, cook in two batches.", tip:"Throw the leftover marinade away and wash your hands."},
+   {t:"Don't touch the chicken for 4 minutes, so it browns.", timer:{min:4, label:"Chicken side 1"}},
+   {t:"Flip the strips and cook 3 more minutes. Cut the thickest one open. No pink and clear juice means it's done (74 °C if you have a thermometer). Still pink? 1–2 more minutes.", timer:{min:3, label:"Chicken side 2"}, tip:"Using thighs? Give them 1–2 extra minutes on each side."},
+   {t:"Tip the peppers and onion back in with the chicken. Squeeze in {0.5 limes} and toss for 1 minute so it's all hot.", timer:{min:1, label:"Toss together"}},
+   {t:"Fluff the rice with a fork. Line up {P} containers and split the rice, beans and fajita chicken between them. Keep the toppings out."},
+   {t:"Your bowl: avocado, salsa, a spoon of Greek yogurt and some cilantro. The rest ({R} more) go in the fridge within an hour. Microwave first, then add the toppings.", tip:"Leftover fajita chicken also makes a great wrap in a tortilla."}
+  ],
+  skill:"Charring vegetables in a hot cast iron pan."},
+ {id:"tinga", name:"Smoky chicken tinga bowls", short:"Chicken tinga bowl", sub:"50 min · makes {P} bowls",
+  main:{label:"chicken", base:800, unit:"g", hint:"Breasts or thighs both work. One breast is roughly 250–300 g."}, portions:4, keep:4,
+  need:["{800 g} boneless skinless chicken breasts or thighs","{1 yellow onions}, {3 garlic cloves}","{2 chipotle peppers} from a can of chipotles in adobo, plus {1 tbsp} of the sauce","{1 cans} diced tomatoes (398 mL)","{1 cups} low-sodium chicken broth","{1 tsp} cumin, {1 tsp} oregano, salt","{0.5 limes}","{1.5 cups} rice","{1 cans} black beans","{2 cups} frozen corn","Avocado oil","Avocado, cilantro, a little cheese or Greek yogurt for the top"],
+  steps:[
+   {t:"Fan on high. Rinse {1.5 cups} of rice in a sieve. Put it in a pot with {2.25 cups} water and a pinch of salt. Burner on high."},
+   {t:"When it boils, put the lid on and turn it down to low.", timer:RICE},
+   {t:"Cut {1 yellow onions} in half from top to root, peel it, and slice it into thin half-moons. Chop {3 garlic cloves}."},
+   {t:"Open the can of chipotles. Take out {2 chipotle peppers} and chop them small.", tip:"They're smoky and spicy. 1 is mild, 2 is medium, 3 is hot. Freeze the rest of the can flat in a freezer bag and snap off what you need next time."},
+   {t:"High-sided pan on medium with 1 tbsp oil. Add the onion and a pinch of salt. Cook until it's soft and starting to go golden.", timer:{min:5, label:"Onion"}},
+   {t:"Add the garlic, {1 tsp} cumin and {1 tsp} oregano. Stir for 1 minute.", timer:{min:1, label:"Garlic + spices"}},
+   {t:"Add the chopped chipotles, {1 tbsp} of the adobo sauce from the can, the diced tomatoes and {1 cups} chicken broth. Stir and bring it up to a bubble."},
+   {t:"Lay the chicken pieces in whole and push them down into the sauce. Turn it down to medium-low, put the lid on, and simmer. Flip the pieces halfway.", timer:{min:18, label:"Chicken simmering", then:"Cut into the thickest piece. No pink means it's done (74 °C). Still pink? Lid back on for 3 more minutes."}, tip:"Cooking the chicken right in the sauce keeps it juicy, and the smoky flavour soaks in."},
+   {t:"While it simmers: drain the black beans in the sieve and rinse them. Warm them in a small pot on medium-low with a pinch of salt.", timer:{min:5, label:"Beans"}},
+   {t:"Heat the cast iron pan on medium-high with ½ tbsp oil for 3 minutes. Add {2 cups} frozen corn, spread it flat and leave it alone for 3 minutes. Stir, then 2 more minutes, until it has golden spots.", timer:{min:5, label:"Corn"}},
+   {t:"When the chicken's done, lift it out onto the cutting board. Turn the sauce up to medium and let it bubble with the lid off so it thickens.", timer:{min:5, label:"Sauce thickening"}},
+   {t:"Shred the chicken with two forks.", tip:"Hold a piece still with one fork and drag the other fork through it. Warm chicken shreds way easier than cold."},
+   {t:"Put the shredded chicken back in the sauce and stir. Squeeze in {0.5 limes}. Taste, and add salt a pinch at a time if it needs it."},
+   {t:"Fluff the rice with a fork. Line up {P} containers and split the rice, beans, corn and chicken tinga between them. Keep the toppings out."},
+   {t:"Your bowl: avocado, cilantro and a little cheese or Greek yogurt. The rest ({R} more) go in the fridge within an hour. Microwave first, then add the toppings.", tip:"Tinga tastes even better the next day, once the sauce has soaked in. Perfect for lunches."}
+  ],
+  skill:"Cooking chicken right in the sauce, and shredding it."},
+ {id:"elote", name:"Street corn chicken bowls", short:"Street corn bowl", sub:"40 min · makes {P} bowls",
+  main:{label:"chicken thighs", base:800, unit:"g", hint:"No scale? Go by the pack label. Close enough is fine."}, portions:4, keep:4,
+  need:["{800 g} boneless skinless chicken thighs","Chili rub: {2 tsp} chili powder, {1 tsp} cumin, {1 tsp} smoked paprika, {1 tsp} garlic powder, {1 tsp} salt, {0.5 tsp} pepper","{3 cups} frozen corn","{0.25 cups} plain Greek yogurt (plus {1 tbsp} mayo if you have it)","{60 g} feta (or cotija)","{0.25 red onions}, {0.5 jalapeños}","{2 limes}","A handful of cilantro","{1.5 cups} rice","{1 cans} black beans","Avocado oil","Avocado and hot sauce for the top"],
+  steps:[
+   {t:"Fan on high. Rinse {1.5 cups} of rice in a sieve. Put it in a pot with {2.25 cups} water and a pinch of salt. Burner on high."},
+   {t:"When it boils, put the lid on and turn it down to low.", timer:RICE},
+   {t:"In a big bowl, mix {1 tbsp} avocado oil, {2 tsp} chili powder, {1 tsp} cumin, {1 tsp} smoked paprika, {1 tsp} garlic powder, {1 tsp} salt and {0.5 tsp} pepper into a paste. Add the chicken thighs and toss with your hands until coated. Wash your hands.", tip:"No marinating time needed. Thighs stay juicy, so the rub goes on and they go straight in the pan."},
+   {t:"Put the cast iron pan on medium-high with ½ tbsp oil. Let it heat for 3–4 minutes.", timer:{min:4, label:"Pan heating"}},
+   {t:"Tip in {3 cups} frozen corn and spread it flat. Leave it alone for 3 minutes, stir, then 3 more, until lots of kernels are golden brown with a few dark spots. Tip it into a big bowl to cool.", timer:{min:6, label:"Corn"}, tip:"Can't spread it flat? Do it in two rounds. Piled-up corn steams instead of toasting."},
+   {t:"Add ½ tbsp oil to the same pan. Lay the thighs in flat, with a gap between each. Don't touch them for 6 minutes. They let go of the pan by themselves when they're ready.", timer:{min:6, label:"Chicken side 1"}},
+   {t:"Flip every piece. Cook 6 more minutes.", timer:{min:6, label:"Chicken side 2"}},
+   {t:"Cut into the thickest piece. No pink and clear juice means it's done (74 °C if you have a thermometer). Move it to the cutting board to rest.", timer:{min:5, label:"Chicken resting"}},
+   {t:"Drain the black beans in the sieve and rinse them. Warm them in a small pot on medium-low with a pinch of salt.", timer:{min:5, label:"Beans"}},
+   {t:"Now the street corn. Dice {0.25 red onions} very small. Cut {0.5 jalapeños} in half the long way, scrape out the seeds, and dice it tiny. Chop a handful of cilantro.", tip:"Wash your hands right after the jalapeño, and don't touch your eyes."},
+   {t:"Add to the corn: the onion, jalapeño and cilantro, {0.25 cups} Greek yogurt (plus {1 tbsp} mayo if you have it), the juice of {1 limes}, {0.5 tsp} chili powder and a pinch of salt. Crumble in {60 g} feta and stir. It should taste tangy, creamy and a little spicy."},
+   {t:"Chop the chicken into bite-size pieces and squeeze {0.5 limes} over it."},
+   {t:"Fluff the rice with a fork. Line up {P} containers and split the rice, beans and chicken between them. Put the street corn in its own small containers: it's eaten cold, never microwaved."},
+   {t:"Your bowl: a big scoop of street corn on top, plus avocado and hot sauce. The rest ({R} more) go in the fridge within an hour. Microwave the bowl, then add the cold corn and the avocado.", tip:"The street corn keeps 3 days in the fridge, and it's great as a side with any of the other meals too."}
+  ],
+  skill:"Toasting corn, and making a no-cook sauce."},
+ {id:"fried", name:"Leftover fried rice", short:"Fried rice", sub:"15 min · turns leftover meat into a new meal",
   main:{label:"leftover meat", base:1, unit:"portions"}, portions:1, keep:4, noFreeze:true, noFridge:true,
   need:["{1 portions} of leftover cooked meat (beef, chicken, chili meat, whatever's in the fridge)","{1.5 cups} cooked rice (cold day-old rice is best)","{1 eggs}","{0.25 onions}","{1 garlic cloves}","A handful of frozen corn (optional)","{1 tbsp} soy sauce, black pepper, hot sauce","1 tbsp oil"],
   steps:[
@@ -275,50 +369,68 @@ const RECIPES = [
   ],
   skill:"Reheating leftovers safely, and crisping rice."}
 ];
-const SHOP = [
-  ["Meat & fish", [
-    ["chk","Boneless skinless chicken thighs, about 800 g",14.10,"seen"],
-    ["beef","Lean ground beef, 900 g 2-pack",16.00,"seen"],
-    ["beef2","Lean ground beef, 450 g pack",9.00,"seen"],
-    ["sal","Salmon fillets, about 400 g, pre-packed (frozen pink is $11.99)",22.00,"seen"]
-  ]],
-  ["Produce", [
-    ["pot","Potatoes, 5 lb bag",4.00,"guess"],
-    ["oni","Yellow onions, 3 lb bag (skip if you have 3+)",2.74,"seen"],
-    ["pep","Bell peppers, 4-pack",4.99,"seen"],
-    ["lime","Limes ×4",2.50,"guess"],
-    ["cil","Cilantro, 1 bunch",1.50,"guess"],
-    ["avo","Avocados ×2",4.00,"guess"],
-    ["rom","Roma tomatoes ×3",2.00,"guess"],
-    ["jal","Jalapeños ×2",0.50,"guess"],
-    ["lem","Lemon ×1",1.00,"guess"]
-  ]],
-  ["Cans, cartons & frozen", [
-    ["bb","Black beans, 540 mL can",1.50,"seen"],
-    ["kb","Red kidney beans, 540 mL can",1.50,"seen"],
-    ["tom","Crushed or diced tomatoes, 796 mL can",1.97,"seen"],
-    ["paste","Tomato paste, small can",1.00,"guess"],
-    ["sauce","Tomato sauce, small can",1.50,"guess"],
-    ["broth","Low-sodium beef broth, 900 mL",3.00,"guess"],
-    ["corn","Frozen corn, 750 g",3.00,"seen"],
-    ["gb","Frozen green beans, 750 g",3.00,"guess"]
-  ]],
-  ["Dairy", [
-    ["sc","Sour cream, 500 mL",2.68,"seen"]
-  ]]
-];
-// The plan, by date. Skipping a night pushes everything after it back a day.
-const DAYS = {
-  "2026-11-03": {cook:"tonight", eat:"Dinner: the beef rice bowl. Half of it is tomorrow's lunch."},
-  "2026-11-04": {cook:"bowls", eat:"Get the chicken in the marinade at least 30 minutes before you cook (steps 1 and 2)."},
-  "2026-11-05": {cook:"salsa", eat:"Lunch and dinner: burrito bowls. Optional: fresh salsa for knife practice."},
-  "2026-11-06": {cook:"chili", eat:"Lunch: a burrito bowl."},
-  "2026-11-07": {eat:"Lunch and dinner: chili. Nothing to cook today. Bought frozen salmon? Move it to the fridge tonight."},
-  "2026-11-08": {cook:"salmon", eat:"Lunch: chili."},
-  "2026-11-09": {cook:"picadillo", eat:"Lunch: salmon and potatoes."},
-  "2026-11-10": {eat:"Lunch and dinner: picadillo. Nothing to cook today."},
-  "2026-11-11": {eat:"Lunch: the last picadillo. That's the end of this plan."}
+/* Grocery items. [id, what to buy, rough price, "seen" (checked online) or "guess", big pack?]
+   A big pack (onions, a tub of yogurt...) covers the whole week, so the week list shows it once. */
+const I = {
+  beef450:["beef450","Lean ground beef, 450 g pack",9.00,"seen"],
+  beef900:["beef900","Lean ground beef, 900 g (2 × 450 g)",16.00,"seen"],
+  chk800:["chk800","Boneless skinless chicken (breasts or thighs), about 800 g",14.10,"seen"],
+  thigh800:["thigh800","Boneless skinless chicken thighs, about 800 g",14.10,"seen"],
+  breast700:["breast700","Boneless skinless chicken breasts, about 700 g",12.30,"guess"],
+  sal:["sal","Salmon fillets ×2, about 400 g (frozen pink is about $12)",22.00,"seen"],
+  oni:["oni","Yellow onions, 3 lb bag",2.74,"seen",1],
+  ron:["ron","Red onion ×1",1.00,"guess"],
+  pot:["pot","Potatoes, 5 lb bag",4.00,"guess",1],
+  pep4:["pep4","Bell peppers, 4-pack",4.99,"seen"],
+  pep1:["pep1","Bell pepper ×1",1.50,"guess"],
+  lime1:["lime1","Lime ×1",0.65,"guess"],
+  lime2:["lime2","Limes ×2",1.25,"guess"],
+  cil:["cil","Cilantro, 1 bunch",1.50,"guess"],
+  avo:["avo","Avocados ×2",4.00,"guess"],
+  rom:["rom","Roma tomatoes ×3",2.00,"guess"],
+  jal:["jal","Jalapeños ×2",0.50,"guess"],
+  lem:["lem","Lemon ×1",1.00,"guess"],
+  romaine:["romaine","Romaine hearts, 3-pack",4.00,"guess"],
+  bb:["bb","Black beans, 540 mL can",1.50,"seen"],
+  kb:["kb","Red kidney beans, 540 mL can",1.50,"seen"],
+  tom:["tom","Crushed or diced tomatoes, 796 mL can",1.97,"seen"],
+  dtom:["dtom","Diced tomatoes, 398 mL can",1.29,"guess"],
+  paste:["paste","Tomato paste, small can",1.00,"guess"],
+  sauce:["sauce","Tomato sauce, small can",1.50,"guess"],
+  chip:["chip","Chipotle peppers in adobo, small can",2.50,"guess",1],
+  broth:["broth","Low-sodium beef broth, 900 mL",3.00,"guess",1],
+  cbroth:["cbroth","Low-sodium chicken broth, 900 mL",3.00,"guess",1],
+  corn:["corn","Frozen corn, 750 g bag",3.00,"seen"],
+  gb:["gb","Frozen green beans, 750 g",3.00,"guess"],
+  sc:["sc","Sour cream, 500 mL",2.68,"seen",1],
+  gy:["gy","Plain Greek yogurt, 750 g (swap for sour cream, way more protein)",5.00,"guess",1],
+  feta:["feta","Feta, 200 g (or cotija if you see it)",5.00,"guess"]
 };
+const BUY = {
+  tonight:[I.beef450, I.oni],
+  bowls:[I.chk800, I.lime2, I.bb, I.corn, I.cil, I.avo, I.sc],
+  salsa:[I.rom, I.jal, I.lime1, I.cil, I.oni],
+  chili:[I.beef900, I.pot, I.oni, I.pep4, I.tom, I.paste, I.kb, I.broth, I.sc, I.cil],
+  salmon:[I.sal, I.pot, I.gb, I.lem],
+  picadillo:[I.beef900, I.pot, I.oni, I.pep1, I.jal, I.sauce, I.broth, I.lime1],
+  beeftaco:[I.beef450, I.bb, I.corn, I.paste, I.romaine, I.avo, I.lime1, I.oni, I.gy],
+  fajita:[I.breast700, I.pep4, I.oni, I.lime2, I.bb, I.avo, I.cil, I.gy],
+  tinga:[I.chk800, I.chip, I.dtom, I.cbroth, I.oni, I.bb, I.corn, I.avo, I.cil, I.lime1],
+  elote:[I.thigh800, I.corn, I.bb, I.gy, I.feta, I.ron, I.jal, I.lime2, I.cil, I.avo],
+  fried:[]
+};
+// Shown on the home screen on the day you cook it.
+const AHEAD = {
+  bowls:"Get the chicken in the marinade at least 30 minutes before you cook (steps 1 and 2).",
+  fajita:"Get the chicken in the marinade at least 30 minutes before you cook (steps 1 and 2).",
+  salmon:"The salmon sits on the counter for 30 minutes before it cooks."
+};
+const STAPLES = "Already at home: rice, cheese, butter, eggs, garlic, salsa, soy sauce, hot sauce, avocado oil, and spices (chili powder, cumin, paprika, smoked paprika, oregano, garlic powder, onion powder, cayenne). Read labels: broth, tomato sauce and salsa often have added sugar, so pick ones without it, and low-sodium where you can.";
+
+/* ---------- the week ---------- */
+const WD = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const WD_LONG = {Mon:"Monday", Tue:"Tuesday", Wed:"Wednesday", Thu:"Thursday", Fri:"Friday", Sat:"Saturday", Sun:"Sunday"};
+const RATE = [["loved","Loved it"],["fine","It was okay"],["nope","Not again"]];
 
 /* ---------- word explanations (tap an underlined word in a step) ---------- */
 const GLOSS = [
@@ -349,7 +461,12 @@ const GLOSS = [
  ["tomato paste", "Tomato paste", "Thick, concentrated tomato from a small can. A little adds a lot of tomato flavour."],
  ["\\bfan\\b", "Stove fan", "The fan in the hood above your stove. It pulls smoke out so the smoke alarm doesn't go off."],
  ["toss(?:ed)?(?! it)", "Toss", "Mix by lifting and turning, with your hands or a spoon, until everything's coated."],
- ["timer", "Timers", "Tap the green Start button. The timer floats at the top of the screen and beeps when it's done, even if you've moved on to other steps."]
+ ["\\bchar\\b", "Char", "Dark, almost-black spots on the edges of vegetables from a really hot pan. It tastes smoky and sweet. That's flavour, not burnt."],
+ ["shred", "Shred", "Pull cooked meat apart into thin strings, using two forks."],
+ ["adobo", "Adobo sauce", "The dark red, smoky sauce the chipotle peppers are packed in. It's spicy, so a spoonful goes a long way."],
+ ["half-moons", "Half-moons", "Cut the onion in half, lay the flat side down, and slice across it. Each slice comes out shaped like a half-moon."],
+ ["crumble", "Crumble", "Break it into small bits with your fingers."],
+ ["timer", "Timers","Tap the green Start button. The timer floats at the top of the screen and beeps when it's done, even if you've moved on to other steps."]
 ];
 const GRX = new RegExp(GLOSS.map(g => "(" + g[0] + ")").join("|"), "gi");
 function gloss(h){
@@ -376,24 +493,23 @@ const KEY = "shad-cook-along-2026-11";
 let S = {};
 try { S = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { S = {}; }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
-if (!Array.isArray(S.skips)) S.skips = [];
 if (!Array.isArray(S.fridge)) {
   S.fridge = [{id:"seed", name:"Leftover beef from Tuesday", n:1, date:"2026-11-03", where:"fridge", keep:4}];
 }
+// A starting week. Change any day on the Week screen.
+if (!S.week || typeof S.week !== "object") S.week = {Mon:"elote", Tue:"", Wed:"bowls", Thu:"", Fri:"beeftaco", Sat:"fajita", Sun:"tinga"};
+// Notes start with what you've said so far. Edit them on each recipe.
+if (!S.notes || typeof S.notes !== "object") S.notes = {
+  tonight:{rate:"fine", text:"Me and my girlfriend didn't really mind it. Not a favourite though."},
+  bowls:{rate:"loved", text:"Absolutely phenomenal. The rice, black beans, fried corn and the chicken from the cast iron with avocado all work so well together. More bowls like this please, for lunches and dinners."}
+};
 save();
 
-/* ---------- plan shifting ---------- */
-function shiftFor(k){ return S.skips.filter(s => s < k).length; }
-function planKey(k){ return addDays(k, -shiftFor(k)); }
-function cookDateFor(id){
-  const pk = Object.keys(DAYS).find(k => DAYS[k].cook === id);
-  if (!pk) return null;
-  for (let n = 0; n < 60; n++) {
-    const d = addDays(pk, n);
-    if (!S.skips.includes(d) && planKey(d) === pk) return d;
-  }
-  return pk;
-}
+/* ---------- week plan ---------- */
+function recipeOf(id){ return id ? RECIPES.find(r => r.id === id) : null; }
+function wdOf(k){ return WD[(parseKey(k).getDay() + 6) % 7]; }
+function nextWd(d){ return WD[(WD.indexOf(d) + 1) % 7]; }
+function hasMeat(r){ return r.main.unit === "g" || r.id === "salmon"; }
 
 /* ---------- scaling ---------- */
 const FR8 = ["","⅛","¼","⅜","½","⅝","¾","⅞"];
@@ -508,7 +624,7 @@ setInterval(() => {
 function go(v){ view = v; S.view = v; save(); render(); window.scrollTo(0,0); }
 function render(){
   if (view.screen === "home") return renderHome();
-  if (view.screen === "shop") return renderShop();
+  if (view.screen === "week") return renderWeek();
   return renderRecipe();
 }
 
@@ -594,53 +710,58 @@ function renderHome(){
   app.append(el("p", "muted", "Pick a meal. You get one step at a time, then you tap Next."));
 
   const tk = todayKey();
-  const skippedToday = S.skips.includes(tk);
-  const pk = planKey(tk);
-  const today = DAYS[pk];
-  const shift = shiftFor(tk) + (skippedToday ? 1 : 0);
-  if (today || skippedToday || shift) {
-    const tc = el("div", "today");
-    tc.append(el("span", "eyebrow", "Today · " + esc(todayLabel())));
-    if (skippedToday) {
-      tc.append(el("p", "", "Leftovers night. Nothing to cook. Eat what's at the top of your fridge list." + (today && today.cook ? " " + esc(RECIPES.find(x => x.id === today.cook).name) + " moved to tomorrow." : "")));
-      const row = el("div", "btnrow");
-      row.append(btn("ghost", "Undo, I'm cooking tonight", () => { S.skips = S.skips.filter(s => s !== tk); save(); render(); }));
-      tc.append(row);
-    } else if (today) {
-      tc.append(el("p", "", esc(today.eat)));
-      const row = el("div", "btnrow");
-      if (today.cook) {
-        const r = RECIPES.find(x => x.id === today.cook);
-        row.append(btn("cook-now", "Cook: " + r.name, () => go({screen:"recipe", id:r.id, i:0})));
-        row.append(btn("ghost", "Not tonight: push the plan back a day", () => { if (!S.skips.includes(tk)) S.skips.push(tk); save(); render(); }));
-      }
-      tc.append(row);
-    } else {
-      tc.append(el("p", "", "That's the end of this plan. Use up what's in the fridge."));
-    }
-    if (shift > 0) tc.append(el("p", "muted small", "Plan pushed back " + shift + (shift === 1 ? " day" : " days") + " so far. Meal days below are updated."));
-    app.append(tc);
+  const tw = wdOf(tk), tmw = nextWd(tw);
+  const tr = recipeOf(S.week[tw]), nr = recipeOf(S.week[tmw]);
+  const tc = el("div", "today");
+  tc.append(el("span", "eyebrow", "Today · " + esc(todayLabel())));
+  if (tr) {
+    tc.append(el("p", "", "Tonight: <strong>" + esc(tr.name) + "</strong>." + (AHEAD[tr.id] ? " " + esc(AHEAD[tr.id]) : "")));
+    const row = el("div", "btnrow");
+    row.append(btn("cook-now", "Cook: " + tr.name, () => go({screen:"recipe", id:tr.id, i:0})));
+    row.append(btn("ghost", "Not tonight: swap with tomorrow", () => { const a = S.week[tw]; S.week[tw] = S.week[tmw] || ""; S.week[tmw] = a; save(); render(); }));
+    tc.append(row);
+  } else {
+    tc.append(el("p", "", "Nothing to cook tonight. Eat what's at the top of your fridge list."));
   }
+  if (nr) tc.append(el("p", "muted small", "Tomorrow: " + esc(nr.name) + "." + (hasMeat(nr) ? " If the meat's in the freezer, move it to the fridge tonight." : "")));
+  tc.append(btn("linkish", "Plan the week and see what to buy ›", () => go({screen:"week", day:tw})));
+  app.append(tc);
 
   app.append(renderFridge());
 
+  // Meals planned soonest come first; the rest keep their usual order.
+  const order = WD.slice(WD.indexOf(tw)).concat(WD.slice(0, WD.indexOf(tw)));
+  const firstDay = id => order.find(d => S.week[d] === id);
+  const rank = id => { const d = firstDay(id); return d ? order.indexOf(d) : 99; };
   const list = el("div", "list");
-  RECIPES.forEach(r => {
-    const cd = cookDateFor(r.id);
-    const isToday = cd === tk && !skippedToday;
-    const dayLbl = cd ? wk(cd) : r.day;
+  RECIPES.slice().sort((a, b) => rank(a.id) - rank(b.id)).forEach(r => {
+    const isToday = S.week[tw] === r.id;
+    const dayLbl = firstDay(r.id) || "Any";
     const b = el("button", "pick");
-    const mark = (S["done_" + r.id] ? " ✓" : "") + (isToday ? "<span class=\"chip\">Today</span>" : "");
+    const n = S.notes[r.id], rl = n && RATE.find(x => x[0] === n.rate);
+    const mark = (S["done_" + r.id] ? " ✓" : "") + (isToday ? "<span class=\"chip\">Today</span>" : "") +
+      (rl ? "<span class=\"chip" + (n.rate === "fine" ? " warn" : n.rate === "nope" ? " bad" : "") + "\">" + esc(rl[1]) + "</span>" : "");
     b.innerHTML = "<span class=\"day\">" + esc(dayLbl) + "</span><span><span class=\"name\">" + esc(r.name) + mark + "</span><span class=\"sub\">" + esc(fill(r.sub, ctxFor(r, true))) + "</span></span><span class=\"go\" aria-hidden=\"true\">›</span>";
     b.addEventListener("click", () => go({screen:"recipe", id:r.id, i:0}));
     list.append(b);
   });
   const sb = el("button", "pick shop");
-  sb.innerHTML = "<span class=\"day\">Shop</span><span><span class=\"name\">Grocery list</span><span class=\"sub\">About " + money(shopTotals().total) + " · tick as you go</span></span><span class=\"go\" aria-hidden=\"true\">›</span>";
-  sb.addEventListener("click", () => go({screen:"shop"}));
-  list.append(sb);
+  sb.innerHTML = "<span class=\"day\">Week</span><span><span class=\"name\">Week &amp; groceries</span><span class=\"sub\">Pick a meal for each day · about " + money(weekTotals().total) + " to buy</span></span><span class=\"go\" aria-hidden=\"true\">›</span>";
+  sb.addEventListener("click", () => go({screen:"week", day:tw}));
+  list.prepend(sb);
   app.append(list);
-  app.append(el("p", "muted small", "Recipes based on RecipeTin Eats (chili, salmon), Cooking Classy (burrito bowls) and Laura in the Kitchen (picadillo), adjusted for less salt and no sugar."));
+
+  const nb = el("div", "fridge");
+  nb.append(el("h3", "", "Your notes"));
+  const noted = RECIPES.filter(r => noteText(r)).length;
+  if (noted) {
+    nb.append(el("p", "small muted", "You've got notes on " + noted + " meal" + (noted === 1 ? "" : "s") + ". Copy them all and paste them to Claude to get recipes adjusted, or more like the ones you loved."));
+    const row = el("div", "btnrow"); row.append(copyBtn("Copy all my notes", allNotesText)); nb.append(row);
+  } else {
+    nb.append(el("p", "small muted", "After you cook, rate the meal and write a quick note at the bottom of the recipe."));
+  }
+  app.append(nb);
+  app.append(el("p", "muted small", "Recipes based on RecipeTin Eats (chili, salmon), Cooking Classy (burrito bowls) and Laura in the Kitchen (picadillo), adjusted for less salt and no sugar. The taco, fajita, tinga and street corn bowls are written for this app from the classic versions of each dish, built around the same rice, black beans, corn and cast-iron chicken as the burrito bowls."));
   renderTimers();
 }
 
@@ -732,6 +853,7 @@ function renderRecipe(){
     card.append(el("p", "muted small", "Get these out on the counter. Tick each one."));
     fillNeed();
     card.append(ul);
+    card.append(renderNotes(r));
   } else if (i === total - 1) {
     S["done_" + r.id] = true; save();
     card.innerHTML = "<div class=\"done-mark\" aria-hidden=\"true\">✓</div><h2>Done. Enjoy it.</h2>" +
@@ -755,6 +877,7 @@ function renderRecipe(){
       card.append(box);
     }
     card.append(el("p", "muted small", "Leftovers keep in the fridge for 3–4 days. Reheat once, until steaming hot."));
+    card.append(renderNotes(r, true));
   } else {
     const st = stepFor(r, i-1);
     card.innerHTML = "<div class=\"eyebrow\">Step " + i + "</div><p class=\"step-text\">" + gloss(esc(fill(st.t, c))) + "</p>";
@@ -789,42 +912,155 @@ function renderRecipe(){
   renderTimers();
 }
 
-/* ---------- shop ---------- */
-function shopTotals(){
+/* ---------- notes ---------- */
+function noteText(r){
+  const n = S.notes[r.id]; if (!n) return "";
+  const rl = RATE.find(x => x[0] === n.rate), t = (n.text || "").trim();
+  if (!rl && !t) return "";
+  return "• " + r.name + ": " + (rl ? rl[1] + "." : "") + (rl && t ? " " : "") + t;
+}
+function allNotesText(){
+  const lines = RECIPES.map(noteText).filter(Boolean);
+  return lines.length ? "My Cook Along notes:\n" + lines.join("\n") : "";
+}
+async function copyText(txt){
+  try { await navigator.clipboard.writeText(txt); return true; } catch (e) {}
+  try {
+    const t = document.createElement("textarea"); t.value = txt; t.setAttribute("readonly", "");
+    t.style.position = "fixed"; t.style.opacity = "0"; document.body.append(t); t.select();
+    const ok = document.execCommand("copy"); t.remove(); return ok;
+  } catch (e) { return false; }
+}
+function copyBtn(label, getText){
+  const b = btn("ghost", label, async () => {
+    const txt = getText();
+    if (!txt) { b.textContent = "Nothing written yet"; }
+    else b.textContent = (await copyText(txt)) ? "Copied ✓ Now paste it to Claude" : "Couldn't copy. Press and hold the text to copy it.";
+    setTimeout(() => { b.textContent = label; }, 3000);
+  });
+  return b;
+}
+function renderNotes(r, afterCooking){
+  const box = el("div", "scale");
+  box.append(el("div", "eyebrow", afterCooking ? "How was it?" : "Your notes on this meal"));
+  box.append(el("p", "small muted", "What you liked, what you didn't, what you'd change. Copy it and send it to Claude to get the recipe adjusted."));
+  const n = S.notes[r.id] || {rate:"", text:""};
+  const keep = () => { n.date = todayKey(); S.notes[r.id] = n; save(); };
+  const seg = el("div", "seg three");
+  RATE.forEach(([k, lbl]) => {
+    const b = el("button", n.rate === k ? "on" : "", "<b>" + esc(lbl) + "</b>"); b.type = "button";
+    b.setAttribute("aria-pressed", String(n.rate === k));
+    b.addEventListener("click", () => {
+      n.rate = n.rate === k ? "" : k; keep();
+      [...seg.children].forEach((x, j) => { const on = RATE[j][0] === n.rate; x.className = on ? "on" : ""; x.setAttribute("aria-pressed", String(on)); });
+    });
+    seg.append(b);
+  });
+  box.append(seg);
+  const ta = el("textarea", "notes-ta"); ta.rows = 4; ta.value = n.text || "";
+  ta.placeholder = "e.g. Loved the crispy corn. A bit too spicy. Needed more lime. Would make again.";
+  ta.setAttribute("aria-label", "Your notes on " + r.name);
+  ta.addEventListener("input", () => { n.text = ta.value; keep(); });
+  box.append(ta);
+  const row = el("div", "btnrow");
+  row.append(copyBtn("Copy this note", () => noteText(r) ? "My Cook Along note:\n" + noteText(r) : ""));
+  box.append(row);
+  return box;
+}
+
+/* ---------- week + groceries ---------- */
+// Big packs share one tick across meals; everything else is ticked per meal.
+function buyKey(rid, it){ return it[4] ? "buy_" + it[0] : "buy_" + rid + "_" + it[0]; }
+function sumItems(pairs){
   let total = 0, left = 0;
-  SHOP.forEach(([g, items]) => items.forEach(([id, n, p]) => { if (S["own_"+id]) return; total += p; if (!S["buy_"+id]) left += p; }));
+  pairs.forEach(([rid, it]) => { if (S["own_" + it[0]]) return; total += it[2]; if (!S[buyKey(rid, it)]) left += it[2]; });
   return {total, left};
 }
-function renderShop(){
+function weekGroups(){
+  const bulk = new Map(), groups = [];
+  WD.forEach(d => {
+    const r = recipeOf(S.week[d]); if (!r) return;
+    const items = [];
+    (BUY[r.id] || []).forEach(it => { if (it[4]) { if (!bulk.has(it[0])) bulk.set(it[0], [r.id, it]); } else items.push([r.id, it]); });
+    if (items.length) groups.push([WD_LONG[d] + " · " + r.name, items]);
+  });
+  if (bulk.size) groups.unshift(["Big packs (one covers the week)", [...bulk.values()]]);
+  return groups;
+}
+function weekTotals(){ return sumItems(weekGroups().flatMap(g => g[1])); }
+function buyRow(rid, it){
+  const [id, name, price, kind] = it, bk = buyKey(rid, it), ok = "own_" + id;
+  const row = el("div", "shop-row" + (S[bk] ? " got" : "") + (S[ok] ? " owned" : ""));
+  const left = el("div", "", "<label><input type=\"checkbox\"" + (S[bk] ? " checked" : "") + "><span class=\"what\">" + esc(name) + "</span></label>");
+  left.querySelector("input").addEventListener("change", e => { S[bk] = e.target.checked; save(); renderWeek(); });
+  left.append(btn("have" + (S[ok] ? " on" : ""), "have it", () => { S[ok] = !S[ok]; save(); renderWeek(); }));
+  row.append(left, el("div", "p", money(price) + "<small>" + kind + "</small>"));
+  return row;
+}
+function renderWeek(){
+  keepAwake(false);
+  const tw = wdOf(todayKey());
+  const sel = view.day === "all" || WD.includes(view.day) ? view.day : tw;
+  const y = window.scrollY;
   app.innerHTML = "";
   const top = el("div", "top");
   top.append(btn("home-btn", "‹ All meals", () => go({screen:"home"})));
   app.append(top);
   const tb = el("div", "timers"); tb.id = "timers"; app.append(tb);
-  app.append(el("h1", "", "Grocery list"));
-  app.append(el("p", "muted small", "Tick things as they go in the cart. Tap “have it” for anything already at home. “Seen” prices were checked online on 3 Nov (No Frills and Edmonton flyers); “guess” prices are rough. Bought a bigger pack than listed? That's fine. Each recipe lets you enter what you actually got."));
-  const t = shopTotals();
-  app.append(el("div", "totals", "<div><b>" + money(t.total) + "</b><span>whole list</span></div><div><b>" + money(t.left) + "</b><span>still to grab</span></div>"));
-  SHOP.forEach(([group, items]) => {
-    app.append(el("div", "shop-group", esc(group)));
-    items.forEach(([id, name, price, kind]) => {
-      const row = el("div", "shop-row" + (S["buy_"+id] ? " got" : "") + (S["own_"+id] ? " owned" : ""));
-      const left = el("div", "", "<label><input type=\"checkbox\" id=\"buy_" + id + "\"" + (S["buy_"+id] ? " checked" : "") + "><span class=\"what\">" + esc(name) + "</span></label>");
-      left.querySelector("input").addEventListener("change", e => { S["buy_"+id] = e.target.checked; save(); renderShop(); });
-      left.append(btn("have" + (S["own_"+id] ? " on" : ""), "have it", () => { S["own_"+id] = !S["own_"+id]; save(); renderShop(); }));
-      row.append(left, el("div", "p", money(price) + "<small>" + kind + "</small>"));
-      app.append(row);
+  app.append(el("h1", "", "Week & groceries"));
+  app.append(el("p", "muted small", "Tap a day to pick what you're cooking and see just what to buy for it. Lunches are the leftovers."));
+
+  const grid = el("div", "days");
+  const dayBtn = (key, title, sub) => {
+    const b = el("button", "dayb" + (sel === key ? " on" : "") + (key === tw ? " now" : ""), "<b>" + esc(title) + "</b><span>" + esc(sub) + "</span>");
+    b.type = "button"; b.setAttribute("aria-pressed", String(sel === key));
+    b.addEventListener("click", () => { view = {screen:"week", day:key}; S.view = view; save(); renderWeek(); });
+    return b;
+  };
+  WD.forEach(d => { const r = recipeOf(S.week[d]); grid.append(dayBtn(d, d, r ? r.short : "Leftovers")); });
+  grid.append(dayBtn("all", "Week", "Whole list"));
+  app.append(grid);
+
+  let groups;
+  if (sel !== "all") {
+    const r = recipeOf(S.week[sel]);
+    const box = el("div", "today");
+    box.append(el("h2", "", esc(WD_LONG[sel]) + (sel === tw ? " (today)" : "")));
+    const lab = el("label", "addform");
+    lab.append(el("span", "eyebrow", "What are you cooking?"));
+    const s = el("select", "daysel");
+    s.innerHTML = "<option value=\"\">Nothing: leftovers night</option>" +
+      RECIPES.map(x => "<option value=\"" + x.id + "\"" + (S.week[sel] === x.id ? " selected" : "") + ">" + esc(x.name) + "</option>").join("");
+    s.addEventListener("change", () => { S.week[sel] = s.value; save(); renderWeek(); });
+    lab.append(s); box.append(lab);
+    if (r) box.append(btn("linkish", "Open the recipe ›", () => go({screen:"recipe", id:r.id, i:0})));
+    app.append(box);
+    groups = r && (BUY[r.id] || []).length ? [[r.name, BUY[r.id].map(it => [r.id, it])]] : [];
+    if (!r) app.append(el("p", "muted", "Nothing to buy. Eat what's in the fridge."));
+    else if (!groups.length) app.append(el("p", "muted", "Nothing to buy: this one uses up what's already in the fridge."));
+  } else {
+    groups = weekGroups();
+    if (!groups.length) app.append(el("p", "muted", "No meals picked yet. Tap a day above to choose one."));
+    else app.append(el("p", "muted small", "Raw meat keeps 1–2 days in the fridge. Shopping for the whole week? Freeze the meat for later in the week, and move it to the fridge the night before."));
+  }
+  if (groups.length) {
+    const t = sumItems(groups.flatMap(g => g[1]));
+    app.append(el("div", "totals", "<div><b>" + money(t.total) + "</b><span>" + (sel === "all" ? "whole week" : "for " + esc(WD_LONG[sel])) + "</span></div><div><b>" + money(t.left) + "</b><span>still to grab</span></div>"));
+    groups.forEach(([title, pairs]) => {
+      app.append(el("div", "shop-group", esc(title)));
+      pairs.forEach(([rid, it]) => app.append(buyRow(rid, it)));
     });
-  });
-  app.append(el("p", "muted small", "Already at home: rice, cheese, butter, eggs, garlic (you need about 10 cloves), salsa, soy sauce, spices, avocado oil. Read labels: broth, tomato sauce and salsa often have added sugar, so pick ones without it, and low-sodium where you can."));
-  app.append(btn("home-btn", "Clear all ticks", () => { Object.keys(S).forEach(k => { if (k.startsWith("buy_") || k.startsWith("own_")) delete S[k]; }); save(); renderShop(); }));
+  }
+  app.append(el("p", "muted small", "Tick things as they go in the cart. Tap “have it” for anything already at home. “Seen” prices were checked online in early November (No Frills and Edmonton flyers); “guess” prices are rough. " + esc(STAPLES)));
+  app.append(btn("home-btn", "Clear all ticks", () => { Object.keys(S).forEach(k => { if (k.startsWith("buy_") || k.startsWith("own_")) delete S[k]; }); save(); renderWeek(); }));
   const sp = el("div"); sp.style.height = "24px"; app.append(sp);
   renderTimers();
+  window.scrollTo(0, y);
 }
 
 /* ---------- gestures ---------- */
 let tx = null, ty = null;
-document.addEventListener("touchstart", e => { if (view.screen !== "recipe" || e.target.closest("input,label,button,select")) { tx = null; return; } tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive:true});
+document.addEventListener("touchstart", e => { if (view.screen !== "recipe" || e.target.closest("input,label,button,select,textarea")) { tx = null; return; } tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive:true});
 document.addEventListener("touchend", e => {
   if (tx === null) return;
   const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty; tx = null;
@@ -833,12 +1069,13 @@ document.addEventListener("touchend", e => {
   else { const b = document.querySelector(".nav button"); if (b && !b.disabled) b.click(); }
 }, {passive:true});
 document.addEventListener("keydown", e => {
-  if (view.screen !== "recipe" || e.target.closest("input,select")) return;
+  if (view.screen !== "recipe" || e.target.closest("input,select,textarea")) return;
   if (e.key === "ArrowRight") document.querySelector(".nav .next")?.click();
   if (e.key === "ArrowLeft") { const b = document.querySelector(".nav button"); if (b && !b.disabled) b.click(); }
 });
 
-if (S.view && (S.view.screen === "shop" || (S.view.screen === "recipe" && RECIPES.some(r => r.id === S.view.id)))) view = S.view;
+if (S.view && S.view.screen === "shop") S.view = {screen:"week"};
+if (S.view && (S.view.screen === "week" || (S.view.screen === "recipe" && RECIPES.some(r => r.id === S.view.id)))) view = S.view;
 render();
 </script>
 </body>
